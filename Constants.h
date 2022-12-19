@@ -1,0 +1,9 @@
+#ifndef CONSTANTS.H
+#define CONSTANTS.H
+
+#define BOARDWIDTH 60
+#define BOARDHEIGHT 32
+#define TEXTUREWIDTH 32
+#define TEXTUREHEIGHT 32
+
+#endif
