@@ -9,68 +9,30 @@
 #include "Snake.cpp"
 #include "Apple.cpp"
 #include "Constants.h"
+#include "Functions.cpp"
 #include <unistd.h>
 
 using namespace std;
 
 
-void updateSnake(vector<Snake> &snake, int direction){
-    int prevDirection = snake.at(0).direction;
-    snake.at(0).direction = direction;
-    snake.at(0).updatePosition();
-    int tempDirection;
-    for(int i = 1; i < snake.size(); i++){
-        tempDirection = snake.at(i).direction;
-        snake.at(i).direction = prevDirection;
-        snake.at(i).updatePosition();
-        prevDirection = tempDirection;
-    }
-}
-
-
-bool checkCollision(vector<Snake> &snake){
-    if(snake.at(0).destrect.x < 0 || snake.at(0).destrect.x > BOARDWIDTH*32){
-        return true;
-    }
-    
-    if(snake.at(0).destrect.y < 0 || snake.at(0).destrect.y > BOARDHEIGHT*32){
-        return true;
-    }
-    
-    for(int i = 1; i < snake.size(); i++){
-        if(snake.at(0).destrect.x == snake.at(i).destrect.x && snake.at(0).destrect.y == snake.at(i).destrect.y){
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-
-bool checkFood(Snake &snake, Apple &apple){
-    if(snake.destrect.x == apple.destrect.x && snake.destrect.y == apple.destrect.y){
-        return true;
-    }
-    return false;
-}
-
-
 int main(int argc, char *argv[]){
+    //Seeding Random and initializing snake vector and apple
     srand(time(0));
     vector<Snake> snake;
     Apple apple;
     
+    //Initializing SDL, IMG, and TTF
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
+    
+    //Creating Window and renderer
     SDL_Window *window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, BOARDWIDTH*32, BOARDHEIGHT*32, SDL_WINDOW_SHOWN);
     if(NULL == window){cout << "failed to initialize window" << endl;}
     SDL_Renderer *render = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
-    SDL_Texture* snakeTex = IMG_LoadTexture(render, "Media/Snake.png");
-    apple.appleTex = IMG_LoadTexture(render, "Media/Apple.png");
-    SDL_Event event;
     
+    //Creating the intro text (May abstract this for score too)
     TTF_Font* font = TTF_OpenFont("Media/8bitOperatorPlus8-Regular.ttf", 24);
     SDL_Color White ={255, 255, 255};
     SDL_Surface* text = TTF_RenderText_Solid(font, "Press Enter to start the game", White);
@@ -81,38 +43,59 @@ int main(int argc, char *argv[]){
     introRect.w = text->w;
     introRect.h = text->h;
     
-    int direction = 3;
-    int food = 1;
-    for(int i = 0; i < food; i++){
-        Snake tempSnake;
-        snake.push_back(tempSnake);
-    }
-    
-    apple.changeposition(snake.at(0));
-    
-    while(1){
+    //Creating event 
+    SDL_Event event;
+    //Playing introScreen loop that prompts the user for enter
+    bool introScreen = true;
+    while(introScreen){
         SDL_RenderClear(render);
         SDL_RenderCopy(render, introTexture, NULL, &introRect);
+        //Allows the game to start once user presses enter
         if(SDL_PollEvent(&event) && SDL_KEYDOWN == event.type && SDLK_RETURN == event.key.keysym.sym){
-            break;
-        }
-        if(SDL_PollEvent(&event) && SDL_QUIT == event.type){
-            TTF_Quit();
             SDL_DestroyTexture(introTexture);
-            SDL_DestroyTexture(snakeTex);
+            introScreen = false;
+        }
+        //Quits the game and deallocates everything to deal with garbage
+        if(SDL_PollEvent(&event) && SDL_QUIT == event.type){
+            SDL_DestroyTexture(introTexture);
             SDL_DestroyRenderer(render);
             SDL_DestroyWindow(window);
+            IMG_Quit();
+            TTF_Quit();
             SDL_Quit();
             return 0;
         }
         SDL_RenderPresent(render);
         
     }
+    
+    //Creating texture for snake and apple (might move apple to not contain it's own texture)
+    SDL_Texture* snakeTex = IMG_LoadTexture(render, "Media/Snake.png");
+    SDL_Texture* appleTex = IMG_LoadTexture(render, "Media/Apple.png");
+    
+    //Initialize direction and food, starts food at 1, technically could start it larger, but that would require dealing with not starting each link at 0,0
+    int direction = 3;
+    int food = 1;
+    Snake tempSnake;
+    snake.push_back(tempSnake);
+    
+    //Randomizes our apple position
+    apple.changeposition(snake.at(0));
+    
+    //main bool for gameRunning
     bool gameRunning = true;
+    
+    //main game loop
+    int start;
+    int end;
+    float elapsedMS;
+    
     while(gameRunning){
-        int start = SDL_GetPerformanceCounter();
+        //Performance counter to eventuall use to control fps
+        start = SDL_GetPerformanceCounter();
         SDL_RenderClear(render);
-        // game  state check
+        
+        // game  state check involving collision and food, simple math and checking of collision
         if(checkCollision(snake)){
             gameRunning = false;
         }
@@ -140,26 +123,22 @@ int main(int argc, char *argv[]){
             apple.changeposition(snake.at(0));
             
         }
-        
+        //Main user input function that controls snake movement and control interrupts
         if (SDL_PollEvent(&event)){
             //Input handling
             switch(event.type){
                 case SDL_KEYDOWN:
                 switch(event.key.keysym.sym){
                     case SDLK_UP:
-                    cout << "UP ARROW DOWN" << endl;
                     direction = 1;
                     break;
                     case SDLK_LEFT:
-                    cout << "LEFT ARROW DOWN" << endl;
                     direction = 4;
                     break;
                     case SDLK_DOWN:
-                    cout << "DOWN ARROW DOWN" << endl;
                     direction = 2;
                     break;
                     case SDLK_RIGHT:
-                    cout << "RIGHT ARROW DOWN" << endl;
                     direction = 3;
                     break;
                 }
@@ -171,23 +150,33 @@ int main(int argc, char *argv[]){
                 break;
             }
         }
+        
+        //Updates snake position and links
         updateSnake(snake, direction);
-        SDL_RenderCopy(render, apple.appleTex, NULL, &apple.destrect);
+        
+        //Renders apple every loop
+        SDL_RenderCopy(render, appleTex, NULL, &apple.destrect);
+        
+        //Loop to go over snake body
         for (int i = 0; i < snake.size(); i++){
             SDL_RenderCopy(render, snakeTex, NULL, &snake.at(i).destrect);
         }
-        //event handling end
+        
+        //Presents the render
         SDL_RenderPresent(render);
-        int end = SDL_GetPerformanceCounter();
-        float elapsedMS = (end-start)/(float)SDL_GetPerformanceFrequency()*1000.0f;
+        
+        //Logic for dealing with fps, need to work on this because it's a little fast
+        end = SDL_GetPerformanceCounter();
+        elapsedMS = (end-start)/(float)SDL_GetPerformanceFrequency()*1000.0f;
         SDL_Delay(floor(60.0f - elapsedMS));
     }
     
-    TTF_Quit();
-    SDL_DestroyTexture(introTexture);
+    //Clears everything that was used
     SDL_DestroyTexture(snakeTex);
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
+    TTF_Quit();
+    IMG_Quit();
     SDL_Quit();
     
     return 0;

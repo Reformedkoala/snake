@@ -1,11 +1,13 @@
 #include "Constants.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#pragma once
 
+//Apple struct to store associated values and related function
+//May move function outside to move towards a more procedural and functional design
 struct Apple{
     SDL_Rect srcrect;
     SDL_Rect destrect;
-    SDL_Texture* appleTex;
     
     //Need to implement checking snake position as well, but can do that later
     void changeposition(Snake &snake){
@@ -25,7 +27,6 @@ struct Apple{
     };
     
     Apple(){
-        appleTex = nullptr;
         srcrect.x = 0;
         srcrect.y = 0;
         srcrect.w = TEXTUREWIDTH;
@@ -35,10 +36,5 @@ struct Apple{
         destrect.w = TEXTUREWIDTH;
         destrect.h = TEXTUREHEIGHT;
     }
-    
-    ~Apple(){
-        SDL_DestroyTexture(appleTex);
-    }
-    
 };
 
