@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
         
         // game  state check involving collision and food, simple math and checking of collision
         if(checkCollision(snake)){
-            if(replayScreen(render, event)){
+            if(replayScreen(render, event, food)){
                 gameRunning = true;
                 snake.clear();
                 direction = 3;
