@@ -3,7 +3,6 @@ This is a recreation of the classic game Snake in c++ using SDL2, I plan to even
 
 #TODO
 Add Score
-Refactor functions in Apple and Snake to be in functions instead of the struct
 Add fullscreen
 Add input for screen resolution
 Better manage the fps as it feels extremely fast currrently

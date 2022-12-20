@@ -1,5 +1,5 @@
-#ifndef CONSTANTS.H
-#define CONSTANTS.H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 #define BOARDWIDTH 60
 #define BOARDHEIGHT 32

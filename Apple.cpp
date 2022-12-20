@@ -9,23 +9,6 @@ struct Apple{
     SDL_Rect srcrect;
     SDL_Rect destrect;
     
-    //Need to implement checking snake position as well, but can do that later
-    void changeposition(Snake &snake){
-        srcrect.x = destrect.x;
-        srcrect.y = destrect.y;
-        int tempx = (rand()%BOARDWIDTH)*TEXTUREWIDTH;
-        int tempy = (rand()%BOARDHEIGHT)*TEXTUREHEIGHT;
-        while(tempx ==  srcrect.x){
-            tempx = rand()%BOARDWIDTH; 
-        }
-        while(tempy ==  srcrect.y){
-            tempy= rand()%BOARDWIDTH; 
-            
-        }
-        destrect.x = tempx;
-        destrect.y = tempy;
-    };
-    
     Apple(){
         srcrect.x = 0;
         srcrect.y = 0;

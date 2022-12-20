@@ -6,11 +6,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <unistd.h>
 #include "Snake.cpp"
 #include "Apple.cpp"
 #include "Constants.h"
 #include "Functions.cpp"
-#include <unistd.h>
 
 using namespace std;
 
@@ -32,41 +32,16 @@ int main(int argc, char *argv[]){
     SDL_Renderer *render = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
     
-    //Creating the intro text (May abstract this for score too)
-    TTF_Font* font = TTF_OpenFont("Media/8bitOperatorPlus8-Regular.ttf", 24);
-    SDL_Color White ={255, 255, 255};
-    SDL_Surface* text = TTF_RenderText_Solid(font, "Press Enter to start the game", White);
-    SDL_Texture* introTexture = SDL_CreateTextureFromSurface(render, text);
-    SDL_Rect introRect;
-    introRect.x = ((BOARDWIDTH*32) / 2) - (text->w/2);
-    introRect.y = ((BOARDHEIGHT*32) / 2) - (text->h/2);
-    introRect.w = text->w;
-    introRect.h = text->h;
-    
     //Creating event 
     SDL_Event event;
-    //Playing introScreen loop that prompts the user for enter
-    bool introScreen = true;
-    while(introScreen){
-        SDL_RenderClear(render);
-        SDL_RenderCopy(render, introTexture, NULL, &introRect);
-        //Allows the game to start once user presses enter
-        if(SDL_PollEvent(&event) && SDL_KEYDOWN == event.type && SDLK_RETURN == event.key.keysym.sym){
-            SDL_DestroyTexture(introTexture);
-            introScreen = false;
-        }
-        //Quits the game and deallocates everything to deal with garbage
-        if(SDL_PollEvent(&event) && SDL_QUIT == event.type){
-            SDL_DestroyTexture(introTexture);
-            SDL_DestroyRenderer(render);
-            SDL_DestroyWindow(window);
-            IMG_Quit();
-            TTF_Quit();
-            SDL_Quit();
-            return 0;
-        }
-        SDL_RenderPresent(render);
-        
+    
+    if(!introScreen(render, event)){
+        SDL_DestroyRenderer(render);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return 0;
     }
     
     //Creating texture for snake and apple (might move apple to not contain it's own texture)
@@ -80,7 +55,7 @@ int main(int argc, char *argv[]){
     snake.push_back(tempSnake);
     
     //Randomizes our apple position
-    apple.changeposition(snake.at(0));
+    changeposition(snake.at(0), apple);
     
     //main bool for gameRunning
     bool gameRunning = true;
@@ -97,7 +72,19 @@ int main(int argc, char *argv[]){
         
         // game  state check involving collision and food, simple math and checking of collision
         if(checkCollision(snake)){
-            gameRunning = false;
+            if(replayScreen(render, event)){
+                gameRunning = true;
+                snake.clear();
+                direction = 3;
+                food = 1;
+                Snake tempSnake;
+                snake.push_back(tempSnake);
+                changeposition(snake.at(0), apple);
+                continue;
+            }else{
+                gameRunning = false;
+                continue;
+            }
         }
         if(checkFood(snake.at(0), apple)){
             food++;
@@ -120,7 +107,7 @@ int main(int argc, char *argv[]){
                 break;
             }
             snake.push_back(tempSnake);
-            apple.changeposition(snake.at(0));
+            changeposition(snake.at(0), apple);
             
         }
         //Main user input function that controls snake movement and control interrupts
@@ -158,7 +145,7 @@ int main(int argc, char *argv[]){
         SDL_RenderCopy(render, appleTex, NULL, &apple.destrect);
         
         //Loop to go over snake body
-        for (int i = 0; i < snake.size(); i++){
+        for (unsigned int i = 0; i < snake.size(); i++){
             SDL_RenderCopy(render, snakeTex, NULL, &snake.at(i).destrect);
         }
         

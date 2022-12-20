@@ -18,24 +18,5 @@ struct Snake{
         destrect.w = TEXTUREWIDTH;
         destrect.h = TEXTUREHEIGHT;
     }
-    
-    void updatePosition(){
-        srcrect.x = destrect.x;
-        srcrect.y = destrect.y;
-        switch(this->direction){
-            case 1:
-            destrect.y -= TEXTUREHEIGHT;
-            break;
-            case 2:
-            destrect.y += TEXTUREHEIGHT;
-            break;
-            case 3:
-            destrect.x += TEXTUREWIDTH;
-            break;
-            case 4:
-            destrect.x -= TEXTUREWIDTH;
-            break;
-        }
-    }
-    
 };
+
