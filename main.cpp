@@ -148,14 +148,14 @@ int main(int argc, char *argv[]){
         for (unsigned int i = 0; i < snake.size(); i++){
             SDL_RenderCopy(render, snakeTex, NULL, &snake.at(i).destrect);
         }
-        
-        //Presents the render
-        SDL_RenderPresent(render);
-        
         //Logic for dealing with fps, need to work on this because it's a little fast
         end = SDL_GetPerformanceCounter();
         elapsedMS = (end-start)/(float)SDL_GetPerformanceFrequency()*1000.0f;
-        SDL_Delay(floor(60.0f - elapsedMS));
+        
+        SDL_Delay(floor(66.66666f - elapsedMS));
+        cout << elapsedMS << endl;
+        //Presents the render
+        SDL_RenderPresent(render);
     }
     
     //Clears everything that was used
