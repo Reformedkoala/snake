@@ -64,13 +64,16 @@ int main(int argc, char *argv[]){
     int start;
     int end;
     float elapsedMS;
+    int frameCounter=0;
     
     while(gameRunning){
         //Performance counter to eventuall use to control fps
         start = SDL_GetPerformanceCounter();
         SDL_RenderClear(render);
         
+        
         // game  state check involving collision and food, simple math and checking of collision
+        
         if(checkCollision(snake)){
             if(replayScreen(render, event, food)){
                 gameRunning = true;
@@ -110,6 +113,9 @@ int main(int argc, char *argv[]){
             changeposition(snake.at(0), apple);
             
         }
+        
+        
+        
         //Main user input function that controls snake movement and control interrupts
         if (SDL_PollEvent(&event)){
             //Input handling
@@ -139,8 +145,9 @@ int main(int argc, char *argv[]){
         }
         
         //Updates snake position and links
-        updateSnake(snake, direction);
-        
+        if(frameCounter % 4 ==0){
+            updateSnake(snake, direction);
+        }
         //Renders apple every loop
         SDL_RenderCopy(render, appleTex, NULL, &apple.destrect);
         
@@ -152,10 +159,11 @@ int main(int argc, char *argv[]){
         end = SDL_GetPerformanceCounter();
         elapsedMS = (end-start)/(float)SDL_GetPerformanceFrequency()*1000.0f;
         
-        SDL_Delay(floor(66.66666f - elapsedMS));
-        cout << elapsedMS << endl;
+        SDL_Delay(floor(15.666f - elapsedMS));
+        cout << floor(15.666f - elapsedMS) << endl;
         //Presents the render
         SDL_RenderPresent(render);
+        frameCounter++;
     }
     
     //Clears everything that was used

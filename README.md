@@ -4,4 +4,3 @@ This is a recreation of the classic game Snake in c++ using SDL2, I plan to even
 #TODO
 Add fullscreen
 Add input for screen resolution
-Better manage the fps as it feels extremely fast currrently
