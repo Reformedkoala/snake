@@ -51,11 +51,11 @@ void updateSnake(vector<Snake> &snake, int direction){
 
 //Checking collision of the snake on walls or itself
 bool checkCollision(vector<Snake> &snake){
-    if(snake.at(0).srcrect.x < 0 || snake.at(0).srcrect.x > BOARDWIDTH*32){
+    if(snake.at(0).destrect.x < 32 || snake.at(0).destrect.x > (BOARDWIDTH-1)*32){
         return true;
     }
     
-    if(snake.at(0).srcrect.y < 0 || snake.at(0).srcrect.y > BOARDHEIGHT*32){
+    if(snake.at(0).destrect.y < 32 || snake.at(0).destrect.y > (BOARDHEIGHT-1)*32){
         return true;
     }
     
@@ -82,13 +82,13 @@ bool checkFood(Snake &snake, Apple &apple){
 void changeposition(Snake &snake, Apple &apple){
     apple.srcrect.x = apple.destrect.x;
     apple.srcrect.y = apple.destrect.y;
-    int tempx = (rand()%BOARDWIDTH)*TEXTUREWIDTH;
-    int tempy = (rand()%BOARDHEIGHT)*TEXTUREHEIGHT;
+    int tempx = TEXTUREWIDTH+(rand()%(BOARDWIDTH-2))*TEXTUREWIDTH;
+    int tempy = TEXTUREHEIGHT+(rand()%(BOARDHEIGHT-2))*TEXTUREHEIGHT;
     while(tempx ==  apple.srcrect.x){
-        tempx = (rand()%BOARDWIDTH)*TEXTUREWIDTH; 
+        tempx = TEXTUREWIDTH+(rand()%(BOARDWIDTH-2))*TEXTUREWIDTH; 
     }
     while(tempy ==  apple.srcrect.y){
-        tempy = (rand()%BOARDHEIGHT)*TEXTUREHEIGHT; 
+        tempy = TEXTUREHEIGHT+(rand()%(BOARDHEIGHT-2))*TEXTUREHEIGHT; 
     }
     apple.destrect.x = tempx;
     apple.destrect.y = tempy;
@@ -166,4 +166,32 @@ bool replayScreen(SDL_Renderer *render, SDL_Event &event, int food){
         SDL_RenderPresent(render);
         
     }
+}
+
+
+void createWall(vector<Wall> &wall){
+    //Sets up wall around the board
+    for(int i = 0; i < BOARDWIDTH; i ++){
+        Wall tempWall;
+        tempWall.destrect.x = i*32;
+        wall.push_back(tempWall);
+    }
+    for(int i = 1; i < BOARDHEIGHT; i ++){
+        Wall tempWall;
+        tempWall.destrect.y = i*32;
+        wall.push_back(tempWall);
+    }
+    for(int i = 0; i < BOARDWIDTH; i ++){
+        Wall tempWall;
+        tempWall.destrect.x = i*32;
+        tempWall.destrect.y = (BOARDHEIGHT-1)*32;
+        wall.push_back(tempWall);
+    }
+    for(int i = 1; i < BOARDHEIGHT; i ++){
+        Wall tempWall;
+        tempWall.destrect.x = (BOARDWIDTH-1)*32;
+        tempWall.destrect.y = i*32;
+        wall.push_back(tempWall);
+    }
+    
 }

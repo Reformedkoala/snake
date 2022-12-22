@@ -1,22 +1,22 @@
 #include "Constants.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #pragma once
 
-// direction mapping up:1,down:2,right:3,left:4
-//Snake struct containing related values, may move updatePosition outside of struct
-struct Snake{
+//Apple struct to store associated values and related function
+//May move function outside to move towards a more procedural and functional design
+struct Wall{
     SDL_Rect srcrect;
     SDL_Rect destrect;
-    int direction;
     
-    Snake(){
+    Wall(){
         srcrect.x = 0;
         srcrect.y = 0;
         srcrect.w = TEXTUREWIDTH;
         srcrect.h = TEXTUREHEIGHT;
-        destrect.x = 32;
-        destrect.y = 32;
+        destrect.x = 0;
+        destrect.y = 0;
         destrect.w = TEXTUREWIDTH;
         destrect.h = TEXTUREHEIGHT;
     }
 };
-

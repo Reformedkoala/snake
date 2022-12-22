@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "Snake.cpp"
 #include "Apple.cpp"
+#include "Wall.cpp"
 #include "Constants.h"
 #include "Functions.cpp"
 
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]){
     //Seeding Random and initializing snake vector and apple
     srand(time(0));
     vector<Snake> snake;
+    vector<Wall> wall;
     Apple apple;
     
     //Initializing SDL, IMG, and TTF
@@ -44,18 +46,24 @@ int main(int argc, char *argv[]){
         return 0;
     }
     
-    //Creating texture for snake and apple (might move apple to not contain it's own texture)
+    //Creating texture for snake, apple, and wall
     SDL_Texture* snakeTex = IMG_LoadTexture(render, "Media/Snake.png");
     SDL_Texture* appleTex = IMG_LoadTexture(render, "Media/Apple.png");
+    SDL_Texture* wallTex = IMG_LoadTexture(render, "Media/Wall.png");
     
     //Initialize direction and food, starts food at 1, technically could start it larger, but that would require dealing with not starting each link at 0,0
     int direction = 3;
     int food = 1;
     Snake tempSnake;
+    //tempSnake.destrect.x = 32;
+    //tempSnake.destrect.y = 32;
     snake.push_back(tempSnake);
     
     //Randomizes our apple position
     changeposition(snake.at(0), apple);
+    
+    //Creates wall via function because 4 for loops
+    createWall(wall);
     
     //main bool for gameRunning
     bool gameRunning = true;
@@ -89,6 +97,7 @@ int main(int argc, char *argv[]){
                 continue;
             }
         }
+        
         if(checkFood(snake.at(0), apple)){
             food++;
             Snake tempSnake;
@@ -113,7 +122,6 @@ int main(int argc, char *argv[]){
             changeposition(snake.at(0), apple);
             
         }
-        
         
         
         //Main user input function that controls snake movement and control interrupts
@@ -155,6 +163,11 @@ int main(int argc, char *argv[]){
         for (unsigned int i = 0; i < snake.size(); i++){
             SDL_RenderCopy(render, snakeTex, NULL, &snake.at(i).destrect);
         }
+        //Loop to go over wall
+        for (unsigned int i = 0; i < wall.size(); i++){
+            SDL_RenderCopy(render, wallTex, NULL, &wall.at(i).destrect);
+        }
+        
         //Logic for dealing with fps, need to work on this because it's a little fast
         end = SDL_GetPerformanceCounter();
         elapsedMS = (end-start)/(float)SDL_GetPerformanceFrequency()*1000.0f;
